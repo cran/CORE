@@ -1,0 +1,138 @@
+\documentclass{article}
+
+\usepackage{natbib}
+\usepackage{graphics}
+\usepackage{amsmath}
+\usepackage{indentfirst}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+
+\DeclareMathOperator{\var}{var}
+\DeclareMathOperator{\cov}{cov}
+
+\begin{document}
+%\VignetteIndexEntry{Using CORE} \\
+
+<<foo,include=FALSE,echo=FALSE>>=
+options(keep.source = TRUE, width = 60)
+foo <- packageDescription("CORE")
+@
+
+\title{CORE Package for Target inference from collections of genomic intervals (Version \Sexpr{foo$Version})}
+\author{Alexander Krasnitz, Guoli Sun}
+\maketitle
+
+\section{Installation}
+
+To install \verb@CORE@ package, caution 
+should be taken with installing the dependency packages, \verb@parallel@ and 
+\verb@Rmpi@, in advance. 
+\begin{description}
+  \item[parallel] \hfill \\
+From R version 2.14.0, \verb@parallel@ is already a buildin package, no need 
+to install it. This package builds on the work done for CRAN packages 
+\verb@multicore@ and \verb@snow@.
+\url{http://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf}
+  \item[Rmpi] \hfill \\
+Although \verb@Rmpi@ is available from CRAN, installation of \verb@Rmpi@ package may require manually 
+adding path to your MPI environment.\url{http://www.stats.uwo.ca/faculty/yu/Rmpi} 
+Make sure you have OPENMPI software before installing \verb@Rmpi@.Depending on your 
+operating system (Mac, Windows, Linux), there are different instructions. Here's an 
+example on how to do it under Linux. Before installing, make sure you can load MPI
+environment using linux command line like this, 
+
+\texttt{module load openmpi} 
+
+Then to install the package, use command lines with extra configure settings:
+
+\texttt{R CMD INSTALL -l LIBDIR Rmpi\_0.6-3.tar.gz --configure-args="} \\
+\texttt{--with-Rmpi-include=MPIDIR/include/openmpi} \\
+\texttt{--with-Rmpi-libpath=MPIDIR/openmpi/lib} \\
+\texttt{--with-Rmpi-type=OPENMPI"} \\
+
+,where \verb@LIBDIR@ is your R library directory, where you want to put your \verb@Rmpi@
+package.\verb@MPIDIR@ is the directory of your openmpi software. Any problems occur with
+\verb@Rmpi@, please contact \verb@Rmpi@ package maintainer, Hao Yu <hyu at stats.uwo.ca>.
+\end{description}
+
+As long as your R library has "parallel" and "Rmpi", you are ready for \verb@CORE@ 
+package installation. \verb@CORE@ can be installed directly using R function 
+
+\texttt{install.packages("CORE")}
+
+in an open R session, or using one command line under Linux, with the downloaded package.
+
+\texttt{R CMD INSTALL CORE\_1.0.tar.gz}
+
+To load CORE (suppose you install it into default R library using above operations): 
+<<To load>>=
+library(CORE) 
+@
+
+\section{Examples}
+For arguments in function CORE, please refer to the manual page.
+This vignette only focuses on examples choosing the right option of \verb@distrib@ argument.
+There are four options,\verb@"vanilla"@,\verb@"Rparallel"@,\verb@"mpi.ge"@.
+\begin{description}
+  \item[vanilla] \hfill \\ 
+A single-processor mode of execution is chosen. In practice, it can only be used if the randomizations \verb@nshuffle@ is small.
+<<\verb@"vanilla"@>>=
+data(testInputCORE)
+data(testInputBoundaries)
+myCOREobj<-CORE(dataIn=testInputCORE,maxmark=10,nshuffle=1,
+boundaries=testInputBoundaries,seedme=123)
+names(myCOREobj)
+dim(myCOREobj$coreTable)
+dim(myCOREobj$simscores)
+@
+  \item[Rparallel] \hfill \\
+\verb@"Rparallel"@ can perform multi-core tasks on your local machine. The number of cores 
+is the minimum between number of local processors and the argument \verb@njobs@ (when the number of 
+shuffles is larger than the above two). Then the number of shuffles each task will perform, is roughly \\
+the number of (add-on) shuffles $\div$ number of cores.
+<<\verb@"Rparallel"@>>=
+#randomization can be performed with add-on shuffles
+#10 shuffle example based on object with three shuffles already
+newCOREobj<-CORE(dataIn=myCOREobj,keep=c("maxmark","seedme",
+"boundaries"),nshuffle=10,distrib="Rparallel",njobs=2)
+dim(newCOREobj$simscores)
+#example without add-on shuffles 
+myCOREobj<-CORE(dataIn=testInputCORE,maxmark=10,nshuffle=10,
+boundaries=testInputBoundaries,seedme=123,distrib="Rparallel",
+njobs=2)
+dim(myCOREobj$simscores)
+@
+  \item[mpi.ge] \hfill \\
+\verb@"mpi.ge"@ uses MPI (message passing interface) implementation in grid engine environment.
+This option outperforms \verb@"Rparallel"@ when dealing with large number of shuffles per processor. Unlike \verb@"Rparallel"@,
+\verb@njobs@ when using \verb@"mpi.ge"@ gives the number of host machines. Number of shuffles on each host 
+will then be accomplished by as many slave processors as possible from different machines. The results are gathered 
+by each host through message passing functions. If the number of shuffles per slave processor is small,
+\verb@"Rparallel"@ is faster because there is overhead system time to activate MPI and submit grid engine job 
+using \verb@"mpi.ge"@. Run the example below only when grid engine environment is available.(delete the \# when 
+you run the example)
+<<\verb@"mpi.ge"@>>=
+data(testInputCORE)
+data(testInputBoundaries)
+##different parallel methods, time efficiency
+##don't run
+#system.time(myCOREobj<-CORE(dataIn=testInputCORE,maxmark=10,
+#nshuffle=40,boundaries=testInputBoundaries,distrib="mpi.ge",
+#seedme=123,njobs=2))
+#system.time(myCOREobj<-CORE(dataIn=testInputCORE,maxmark=10,
+#nshuffle=40,boundaries=testInputBoundaries,distrib="Rparallel",
+#seedme=123,njobs=2))
+@    
+\end{description} 
+
+\begin{thebibliography}{}
+
+\bibitem[Krasnitz et al.(2013)Sun, Andrews, and Wigler]{grg}
+Alexander Krasnitz, Guoli Sun, Peter Andrews and Michael Wigler.(2013).
+\newblock Target inference from collections of genomic intervals.
+\newblock \emph{PNAS 2013 : 1306909110v1-201306909}.
+
+\end{thebibliography}
+
+\end{document}
