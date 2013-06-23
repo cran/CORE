@@ -1,7 +1,7 @@
 Package: CORE
 Type: Package
 Title: Cores of Recurrent Events
-Version: 1.0
+Version: 1.1
 Author: Alex Krasnitz, Guoli Sun
 Maintainer: Guoli Sun <gsun@cshl.edu>
 Description: given a collection of intervals with integer start and end
@@ -10,8 +10,9 @@ Description: given a collection of intervals with integer start and end
         parallel methods, either using local host machines, or
         submitting grid engine jobs.
 License: GPL-2
-Imports: Rmpi,parallel
-Packaged: 2013-06-21 20:21:58 UTC; gsun
+Imports: parallel
+Suggests: Rmpi
+Packaged: 2013-06-23 15:36:56 UTC; gsun
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2013-06-21 23:10:52
+Date/Publication: 2013-06-24 01:49:48

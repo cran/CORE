@@ -27,7 +27,7 @@ foo <- packageDescription("CORE")
 
 To install \verb@CORE@ package, caution 
 should be taken with installing the dependency packages, \verb@parallel@ and 
-\verb@Rmpi@, in advance. 
+\verb@Rmpi@, in advance. \verb@parallel@ is necessary for all operating systems. \verb@Rmpi@ is optional, it is needed when you are working on grid engine which has MPI software installed, and wish to accelerate the analysis.
 \begin{description}
   \item[parallel] \hfill \\
 From R version 2.14.0, \verb@parallel@ is already a buildin package, no need 
@@ -56,7 +56,7 @@ package.\verb@MPIDIR@ is the directory of your openmpi software. Any problems oc
 \verb@Rmpi@, please contact \verb@Rmpi@ package maintainer, Hao Yu <hyu at stats.uwo.ca>.
 \end{description}
 
-As long as your R library has "parallel" and "Rmpi", you are ready for \verb@CORE@ 
+As long as your R library has "parallel" and "Rmpi"(optional), you are ready for \verb@CORE@ 
 package installation. \verb@CORE@ can be installed directly using R function 
 
 \texttt{install.packages("CORE")}
@@ -110,7 +110,7 @@ This option outperforms \verb@"Rparallel"@ when dealing with large number of shu
 will then be accomplished by as many slave processors as possible from different machines. The results are gathered 
 by each host through message passing functions. If the number of shuffles per slave processor is small,
 \verb@"Rparallel"@ is faster because there is overhead system time to activate MPI and submit grid engine job 
-using \verb@"mpi.ge"@. Run the example below only when grid engine environment is available.(delete the \# when 
+using \verb@"mpi.ge"@. Run the example below only when you installed \verb@Rmpi@ and grid engine environment is available.(delete the \# when 
 you run the example)
 <<\verb@"mpi.ge"@>>=
 data(testInputCORE)

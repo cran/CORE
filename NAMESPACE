@@ -1,2 +1,2 @@
 export("CORE")
-import("Rmpi","parallel")
+import("parallel")
