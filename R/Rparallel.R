@@ -1,39 +1,36 @@
 Rparallel<-function(randfun,distrib,doshuffles,nshuffle,dataIn,returnme,
-	boundaries,njobs){
+	boundaries,njobs,qmem){
         if(distrib=="Rparallel"&doshuffles!="NO"){
-                #ncores<-min(njobs,switch(doshuffles=="FROMSCRATCH",
-                #        nshuffle,nshuffle-dataIn$nshuffle),parallel::detectCores())
-                #cl<-parallel::makeCluster(getOption("cl.cores",ncores))
                 ncores<-min(njobs,ifelse(doshuffles=="FROMSCRATCH",
 												 nshuffle,nshuffle-dataIn$nshuffle))
 								cl<-parallel::makeCluster(ncores)
 								parallel::clusterEvalQ(cl=cl,expr=library(CORE))
         }
-        if(substring(distrib,1,3)=="mpi"&doshuffles!="NO"){
-								WrRmpi()
+        if(distrib=="Grid"&doshuffles!="NO"){
 								ncores<-min(njobs,ifelse(doshuffles=="FROMSCRATCH", 
                          nshuffle,nshuffle-dataIn$nshuffle))
+								WrRGrid(ncores)
 								nshuffle<-returnme$nshuffle
-								if(doshuffles=="FROMSCRATCH"){
-												returnme$nshuffle<-returnme$nshuffle%/%ncores
-												if(nshuffle%%ncores!=0)returnme$nshuffle<-returnme$nshuffle+1
-								}
-								if(doshuffles=="ADD"){
-												returnme$nshuffle<-(returnme$nshuffle-dataIn$nshuffle)%/%ncores
-												if((nshuffle-dataIn$nshuffle)%%ncores!=0)returnme$nshuffle<-returnme$nshuffle+1
-								}
 								save(ncores,doshuffles,dataIn,randfun,boundaries,
 												returnme,file=paste(getwd(),"/tempMPI",sep=""))
-								if(distrib=="mpi.ge"){
-												sink(paste(getwd(),"/Rmpi.sh",sep=""))
-												cat("mpirun -np $NSLOTS Rscript $PWD/Rmpi.R")
-												sink()	
-												system(paste("qsub -V -cwd -sync y -l m_mem_free=2G -pe mpi",as.character(ncores),"Rmpi.sh"))
+								sink(paste(getwd(),"/rjob.sh",sep=""))
+								cat("R CMD BATCH RGrid.R")
+								sink()
+								if(is.na(qmem)){
+								system(paste("qsub  -cwd -V -sync y -l virtual_free=2G -t 1-",ncores,":1 rjob.sh",sep=""))
+								#system(paste("qsub  -cwd -V -sync y -l m_mem_free=2G -t 1-",ncores,":1 rjob.sh",sep=""))
 								}
-								load(paste(getwd(),"/mygather.temp",sep=""))
-								gather.result<-get("gather.result")
-								if(doshuffles=="FROMSCRATCH")mpidata<- gather.result[1:(nshuffle*nrow(returnme$coreTable))]
-								if(doshuffles=="ADD")mpidata<- gather.result[1:((nshuffle-dataIn$nshuffle)*nrow(returnme$coreTable))]
+								if(!is.na(qmem)){
+								system(paste("qsub  -cwd -V -sync y ",qmem," -t 1-",ncores,":1 rjob.sh",sep=""))
+								}
+								load(paste(getwd(),"/mygather.temp.1",sep=""))
+								myresult<-get("x")
+								for(i in 2:ncores){
+									load(paste(getwd(),"/mygather.temp.",as.character(i),sep=""))
+									myresult<-c(myresult,get("x"))
+								}
+								if(doshuffles=="FROMSCRATCH")mpidata<-myresult[1:(nshuffle*nrow(returnme$coreTable))]
+								if(doshuffles=="ADD")mpidata<-myresult[1:((nshuffle-dataIn$nshuffle)*nrow(returnme$coreTable))]
         }
         if(doshuffles=="FROMSCRATCH"){
                 returnme$simscores<-switch(distrib,
@@ -41,7 +38,7 @@ Rparallel<-function(randfun,distrib,doshuffles,nshuffle,dataIn,returnme,
                         Rparallel=matrix(nrow=nrow(returnme$coreTable),
                                 data=unlist(parallel::parSapply(cl=cl,X=1:ncores,FUN=randfun,
                                 COREobj=returnme,boundaries=boundaries,nprocs=ncores))),
-												mpi.ge=matrix(nrow=nrow(returnme$coreTable),data=mpidata)
+												Grid=matrix(nrow=nrow(returnme$coreTable),data=mpidata)
                         )
         }
         else if(doshuffles=="ADD"){
@@ -53,18 +50,19 @@ Rparallel<-function(randfun,distrib,doshuffles,nshuffle,dataIn,returnme,
                                 data=unlist(parallel::parSapply(cl=cl,X=1:ncores,
                                 FUN=randfun,COREobj=returnme,boundaries=boundaries,
                                 rngoffset=dataIn$nshuffle,nprocs=ncores))),
-												mpi.ge=matrix(nrow=nrow(returnme$coreTable),data=mpidata)
+												Grid=matrix(nrow=nrow(returnme$coreTable),data=mpidata)
                 ))
         }
         if("simscores"%in%names(returnme))returnme$p<-
                 (rowSums(returnme$simscores>returnme$coreTable[,"score"])+1)/
                 (ncol(returnme$simscores)+2)
-        if(exists("cl"))stopCluster(cl)
-				if(substring(distrib,1,3)=="mpi"){
+        if(exists("cl"))parallel::stopCluster(cl)
+				if(substring(distrib,1,3)=="Gri"){
 								returnme$nshuffle<-nshuffle
-								system("rm mygather.temp")
+								system("rm mygather.temp.*")
         				system("rm tempMPI")
-								system("rm Rmpi.*")
+								system("rm RGrid.*")
+								system("rm rjob.sh*")
 				}
 	return(returnme)
 }

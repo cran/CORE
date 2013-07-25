@@ -1,6 +1,5 @@
 JCORErandomized <-
-function(procno=1,COREobj,boundaries,nprocs=1,
-	shufflemethod="SIMPLE",rngoffset=0){
+function(procno=1,COREobj,boundaries,nprocs=1,rngoffset=0){
 minscore<-max(COREobj$minscore,min(COREobj$coreTable[,"score"]))
 set.seed(COREobj$seedme)
 COREobj$nshuffle<-COREobj$nshuffle-rngoffset
@@ -25,7 +24,7 @@ for(i in 1:nrow(COREobj$coreTable)){
     data=c(which(COREobj$input[,"chrom"]==COREobj$coreTable[i,"chrom"])[cigt],
     weight[COREobj$input[,"chrom"]==COREobj$coreTable[i,"chrom"]][cigt]))
 }
-simscores<-matrix(ncol=COREobj$nshuffle,nrow=nrow(COREobj$coreTable))
+simscores<-matrix(ncol=myshuffles,nrow=nrow(COREobj$coreTable))
 chrmax<-nrow(boundaries)
 advanceRNG(randopt=COREobj$shufflemethod,nrand=shuffleskip+rngoffset,
 	nevents=nrow(COREobj$input))

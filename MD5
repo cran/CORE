@@ -1,15 +1,15 @@
-5d3d11b9e02b42e3c2ce6f4f78a590d2 *DESCRIPTION
+bf83bc75f6b841837b1616f4d22aa108 *DESCRIPTION
 484c3bab037dd8512f6f9194c58a0bd2 *INDEX
 c76322c54cf4dc61374a13e42fb040d9 *NAMESPACE
-9bfabfe13e5ca09ae79dafd34211bc20 *R/CORE.R
+04660c200a704b7dc465f820d308e890 *R/CORE.R
 cd9b3ec6847901dc03e508901d3181a2 *R/ICOREiteration.R
 1e8a9c80a1b49d64cff446e16df57453 *R/ICORErandomized.R
 c0d317444553a3525c658d6faeac18df *R/JCOREiteration.R
-8d59d0e84f2e24cc7f4cb63403684808 *R/JCORErandomized.R
+f30dc0e5863f744475a8fcd306e3c93a *R/JCORErandomized.R
 5043c7134cdded41486cf3a82748746b *R/PCOREiteration.R
-dde26e161784a98582439c89d45d9b78 *R/PCORErandomized.R
-5e2b47be11e25a665203dcd20d67b8cb *R/Rparallel.R
-0fafb66f235c1652b28f59add77f89d2 *R/WrRmpi.R
+16d100ae242aef2c533b0a4124ea11d0 *R/PCORErandomized.R
+7dc376bd578cc060f9f3cc32c582eefc *R/Rparallel.R
+c45f2ea7a6cfda154ccc37bc7fd66446 *R/WrRGrid.R
 c4f7c60136f7086e00b792bb4e2206ea *R/advanceRNG.R
 8ecad1a97604e0fc05520b2260a2cf59 *R/containment.indicator.R
 7d2f39e313b5bc9302b44bee877df4f2 *R/envelope.indicator.R
@@ -21,9 +21,7 @@ ca1838df593d959077d30e734acf93da *R/randomEventMoves.R
 4383a790bf9328899b08bb2a9445d77e *R/randomRescaledEventMoves.R
 70619fc15241aa2f07bf78a7865c37c4 *data/testInputBoundaries.rda
 c07c4b561f41d04a7eed8bc3b7c05270 *data/testInputCORE.rda
-1933ecb9d15889b3e8640cb4b6973749 *inst/doc/CORE.Rnw
-c0d9f9ef03b13462343c29bc7e871661 *inst/doc/CORE.pdf
-acf998fcfb81166334338ac6ae645f74 *man/CORE.Rd
+c76c2d3c576f7335001956137372a3b9 *man/CORE.Rd
 ba30b2e483a8bf08dd7385edcd3fc55f *man/testInputBoundaries.Rd
 65f9f32ed6950112cc9955a8dca65b4a *man/testInputCORE.Rd
 ac3236cb3f948183733e7bb96d799f8d *spares/CORE-package.Rd
@@ -49,4 +47,3 @@ dcb83b0d8210db0a6670ed0b09dce21d *spares/envelope.indicator.Rd
 021e353858c230d5e142ef448e565fd4 *spares/overlap.indicator.Rd
 26b1e66dd3dba60cdc0e7aadaec71a7f *spares/randomEventMoves.Rd
 e31b4df53e709e131dc8cbb0c3d0bbf3 *spares/randomRescaledEventMoves.Rd
-1933ecb9d15889b3e8640cb4b6973749 *vignettes/CORE.Rnw

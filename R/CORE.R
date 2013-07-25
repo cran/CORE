@@ -3,7 +3,7 @@ function(dataIn,keep=NULL,startcol="start",endcol="end",
 chromcol="chrom",weightcol="weight",maxmark=1,minscore=0,pow=1,
 assoc=c("I","J","P"),nshuffle=0,boundaries=NULL,seedme=sample(1e8,1),
 shufflemethod=c("SIMPLE","RESCALE"),tiny=-1,
-distrib=c("vanilla","Rparallel","mpi.ge"),njobs=1){
+distrib=c("vanilla","Rparallel","Grid"),njobs=1,qmem=NA){
 	doshuffles<-"NO"
 	shufflemethod<-match.arg(shufflemethod)
 	assoc<-match.arg(assoc)
@@ -133,6 +133,6 @@ distrib=c("vanilla","Rparallel","mpi.ge"),njobs=1){
 	if(assoc=="J") randfun<-CORE:::JCORErandomized
 	if(assoc=="P") randfun<-CORE:::PCORErandomized
 	distrib<-match.arg(distrib)
-	returnme<-Rparallel(randfun,distrib,doshuffles,nshuffle,dataIn,returnme,boundaries,njobs)
+	returnme<-Rparallel(randfun,distrib,doshuffles,nshuffle,dataIn,returnme,boundaries,njobs,qmem)
 	return(returnme)
 }

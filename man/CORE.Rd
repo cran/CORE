@@ -13,7 +13,7 @@ CORE(dataIn, keep = NULL, startcol = "start", endcol = "end",
 chromcol = "chrom", weightcol = "weight", maxmark = 1, minscore = 0, 
 pow = 1, assoc = c("I", "J", "P"), nshuffle = 0, boundaries = NULL, 
 seedme = sample(1e+08, 1), shufflemethod = c("SIMPLE", "RESCALE"), 
-tiny = -1, distrib = c("vanilla", "Rparallel","mpi.ge"), njobs = 1)
+tiny = -1, distrib = c("vanilla", "Rparallel","Grid"), njobs = 1,qmem=NA)
 }
 \arguments{
 \item{dataIn}{
@@ -93,16 +93,22 @@ from the input event set.
 \item{distrib}{
 A character string specifying the method of distributed computing used for 
 estimation of significance. If "vanilla" (default), no distributed computing 
-is performed. If "Rparallel", parallel computation with the local host 
-processor is performed using functions from CRAN core package parallel, with 
+is performed. If "Rparallel", parallel computation with the local machine 
+is performed using functions from CRAN core package parallel, with 
 the number of worker processes being the smaller number of \code{njobs},and 
-\code{nshuffle}. If "mpi.ge", parallel computation with grid engine is performed 
-using functions from the CRAN package Rmpi. The number of host worker processes 
-is the smaller number of \code{njobs},and \code{nshuffle}.
+\code{nshuffle}. If "Grid", parallel computation with grid engine is performed. 
+The number of submitted array jobs, or cores that are distributed, is the 
+smaller number of \code{njobs},and \code{nshuffle}. When using "Grid", make 
+sure you have write premission to the current work space.
 }
 \item{njobs}{
 If distributed computing is used for estimation of significance, a single 
 integer specifying the desired number of worker processes.
+}
+\item{qmem}{
+A character string that can customize grid engine \code{qsub} command. The 
+command decides memory size per core(each job). The default substring is 
+"-l virtual_free=2G".  
 }
 }
 \details{
@@ -175,18 +181,22 @@ A matrix with three columns named "chrom", "start" and "end", indicating
 chromosome numbers and boundary positions used for estimation of significance.
 }
 }
-\author{Alex Krasnitz}
+\author{Alex Krasnitz,Guoli Sun}
 \examples{
-#Compute 5 cores and perform a very small number of randomizations 
-#(not enough for a meaningful estimate of significance).
+#Compute 3 cores and perform no randomization 
+#(meaningless for estimate of significance).
 data(testInputCORE)
 data(testInputBoundaries)
-myCOREobj<-CORE(dataIn=testInputCORE,maxmark=5,nshuffle=1,
+myCOREobj<-CORE(dataIn=testInputCORE,maxmark=3,nshuffle=0,
 boundaries=testInputBoundaries,seedme=123)
 \dontrun{
 #Extend this computation to a much larger number of randomizations,
 #using 2 cores of a host computer.
 newCOREobj<-CORE(dataIn=myCOREobj,keep=c("maxmark","seedme","boundaries"),
 nshuffle=20,distrib="Rparallel",njobs=2)
+#When using "Grid", make sure you have write premission to the current 
+#work space.
+newCOREobj<-CORE(dataIn=myCOREobj,keep=c("maxmark","seedme","boundaries"),
+nshuffle=20,distrib="Grid",njobs=2)
 }
 }
