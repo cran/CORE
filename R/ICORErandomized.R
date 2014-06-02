@@ -10,7 +10,7 @@ if(procno<=shuffleres)myshuffles<-myshuffles+1
 weightList<-vector(mode="list",length=nrow(COREobj$coreTable))
 weight<-COREobj$input[,"weight"]
 for(i in 1:nrow(COREobj$coreTable)){
-	za<-COREobj$input[COREobj$input[,"chrom"]==COREobj$coreTable[i,"chrom"],]
+	za<-COREobj$input[COREobj$input[,"chrom"]==COREobj$coreTable[i,"chrom"],,drop=F]
 	cigt<-za[,"start"]<=COREobj$coreTable[i,"start"]&
 		za[,"end"]>=COREobj$coreTable[i,"end"]
 	weight[COREobj$input[,"chrom"]==COREobj$coreTable[i,"chrom"]][cigt]<-      

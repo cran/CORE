@@ -129,9 +129,9 @@ distrib=c("vanilla","Rparallel","Grid"),njobs=1,qmem=NA){
 			tapply(X=y[,"end"],INDEX=y[,"chrom"],FUN=max))
 	}
 	dimnames(boundaries)[[2]]<-c("chrom","start","end")
-	if(assoc=="I") randfun<-CORE:::ICORErandomized
-	if(assoc=="J") randfun<-CORE:::JCORErandomized
-	if(assoc=="P") randfun<-CORE:::PCORErandomized
+	if(assoc=="I") randfun<-ICORErandomized
+	if(assoc=="J") randfun<-JCORErandomized
+	if(assoc=="P") randfun<-PCORErandomized
 	distrib<-match.arg(distrib)
 	returnme<-Rparallel(randfun,distrib,doshuffles,nshuffle,dataIn,returnme,boundaries,njobs,qmem)
 	return(returnme)
