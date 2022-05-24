@@ -1,2 +1,3 @@
 export("CORE")
 import("parallel")
+importFrom("stats", "runif")

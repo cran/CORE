@@ -9,7 +9,7 @@ distrib=c("vanilla","Rparallel","Grid"),njobs=1,qmem=NA){
 	assoc<-match.arg(assoc)
 	if(!(class(dataIn)%in%c("CORE","matrix","data.frame")))
 		stop("invalid class of argument dataIn")
-	if(class(dataIn)=="CORE")if(((!("assoc"%in%keep))&(dataIn$assoc!=assoc))|
+	if(inherits(dataIn,"CORE"))if(((!("assoc"%in%keep))&(dataIn$assoc!=assoc))|
 		((!("pow"%in%keep))&(dataIn$pow!=pow))){
 		cankeep<-c("maxmark","minscore","nshuffle","boundaries","seedme",
 				"shufflemethod","tiny")
@@ -20,7 +20,7 @@ distrib=c("vanilla","Rparallel","Grid"),njobs=1,qmem=NA){
 		chromcol<-"chrom"
 		weightcol<-"weight"
 	}
-	if(class(dataIn)!="CORE"){	#get cores from scratch
+	if(!inherits(dataIn,"CORE")){	#get cores from scratch
 		if(!(startcol%in%dimnames(dataIn)[[2]]))
 			stop("start column missing in input data")
 		if(!(endcol%in%dimnames(dataIn)[[2]]))
